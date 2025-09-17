@@ -4,45 +4,178 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AnimalCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 2rem; }
-      .container { max-width: 800px; margin: 0 auto; }
-      .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-      .row { display: flex; gap: 12px; align-items: center; }
-      textarea { width: 100%; height: 260px; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; }
-      button { background: #2563eb; color: white; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
-      button[disabled] { background: #9ca3af; cursor: not-allowed; }
-      .muted { color: #6b7280; }
+      :root {
+        --bg1: #0b1220;
+        --bg2: #0f172a;
+        --fg: #e5e7eb;
+        --muted: #9aa4b2;
+        --brand1: #6ee7f9;
+        --brand2: #7c3aed;
+        --brand3: #22c55e;
+        --card: rgba(255,255,255,0.06);
+        --border: rgba(255,255,255,0.12);
+        --shadow: 0 10px 40px rgba(0,0,0,0.35);
+      }
+      * { box-sizing: border-box }
+      body {
+        margin: 0; min-height: 100vh; color: var(--fg);
+        background:
+          radial-gradient(1000px 600px at 10% -10%, rgba(124,58,237,0.25), transparent 40%),
+          radial-gradient(900px 700px at 110% 20%, rgba(110,231,249,0.18), transparent 40%),
+          linear-gradient(180deg, var(--bg1), var(--bg2));
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        padding: 32px 20px;
+      }
+      .container { max-width: 1000px; margin: 0 auto; }
+      header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+      .title { display: flex; align-items: center; gap: 12px; }
+      .logo {
+        width: 40px; height: 40px; border-radius: 12px;
+        background: conic-gradient(from 120deg, var(--brand2), var(--brand1), var(--brand3));
+        box-shadow: var(--shadow);
+      }
+      h1 { margin: 0; font-weight: 800; letter-spacing: -0.02em; font-size: 28px; }
+      .subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+
+      .grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+      @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow);
+      }
+
+      .dropzone {
+        border: 2px dashed rgba(255,255,255,0.18);
+        border-radius: 14px;
+        padding: 22px;
+        text-align: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .dropzone.dragging { border-color: var(--brand1); background: rgba(110,231,249,0.06); }
+      .dropzone .hint { color: var(--muted); font-size: 13px; }
+      .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+      .button {
+        background: linear-gradient(135deg, var(--brand2), #5721e6 40%, var(--brand1));
+        color: white; border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; font-weight: 600;
+      }
+      .button.secondary { background: transparent; border: 1px solid var(--border); color: var(--fg); }
+      .button[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+      .preview { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
+      video { width: 100%; border-radius: 12px; border: 1px solid var(--border); }
+
+      .status { color: var(--muted); font-size: 13px; min-height: 18px; }
+      .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -3px; }
+      @keyframes spin { to { transform: rotate(360deg) } }
+
+      .report { height: 420px; resize: vertical; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.25); color: var(--fg); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+      .pill { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+      .badge { width: 8px; height: 8px; background: var(--brand3); border-radius: 999px; }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>AnimalCare – Behavior Report</h1>
-      <p class="muted">Upload a short animal video. We extract frames and generate a behavior and health narrative.</p>
-      <div class="card">
-        <div class="row">
-          <input id="file" type="file" accept="video/*" />
-          <button id="submit">Analyze</button>
+      <header>
+        <div class="title">
+          <div class="logo"></div>
+          <div>
+            <h1>AnimalCare</h1>
+            <p class="subtitle">AI-driven animal behavior and health narratives</p>
+          </div>
         </div>
-        <p id="status" class="muted" style="margin-top: 8px;"></p>
-        <textarea id="output" placeholder="Report will appear here..." readonly></textarea>
+        <div class="pill"><span class="badge"></span>Ready</div>
+      </header>
+
+      <div class="grid">
+        <section class="card">
+          <div id="dropzone" class="dropzone">
+            <input id="file" type="file" accept="video/*" style="display:none" />
+            <p><strong>Drag & drop</strong> a video here, or click to select</p>
+            <p class="hint">Accepted: mp4, mov, avi, mkv</p>
+            <div class="actions">
+              <button id="pick" class="button">Choose Video</button>
+              <button id="analyze" class="button" disabled>Analyze</button>
+              <button id="clear" class="button secondary">Clear</button>
+            </div>
+            <div class="status" id="status"></div>
+            <div class="preview" id="preview" hidden>
+              <video id="vid" controls></video>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3 style="margin-top:0">Behavior Report</h3>
+          <textarea id="output" class="report" placeholder="Report will appear here..." readonly></textarea>
+        </section>
       </div>
     </div>
-    <script>
-      const fileInput = document.getElementById('file');
-      const submitBtn = document.getElementById('submit');
-      const output = document.getElementById('output');
-      const status = document.getElementById('status');
 
-      submitBtn.addEventListener('click', async () => {
-        if (!fileInput.files.length) {
-          alert('Please choose a video file.');
-          return;
+    <script>
+      const dz = document.getElementById('dropzone');
+      const pickBtn = document.getElementById('pick');
+      const analyzeBtn = document.getElementById('analyze');
+      const clearBtn = document.getElementById('clear');
+      const fileInput = document.getElementById('file');
+      const statusEl = document.getElementById('status');
+      const output = document.getElementById('output');
+      const preview = document.getElementById('preview');
+      const vid = document.getElementById('vid');
+
+      let file = null;
+
+      function setStatus(msg, spinning=false) {
+        statusEl.innerHTML = spinning ? `<span class="spinner"></span> ${msg}` : msg;
+      }
+      function reset() {
+        file = null; fileInput.value = '';
+        preview.hidden = true; vid.src = '';
+        output.value = '';
+        analyzeBtn.disabled = true;
+        setStatus('');
+      }
+
+      function setFile(f) {
+        file = f;
+        if (!file) { reset(); return; }
+        const url = URL.createObjectURL(file);
+        vid.src = url; preview.hidden = false;
+        analyzeBtn.disabled = false;
+        setStatus(`${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`);
+      }
+
+      pickBtn.addEventListener('click', () => fileInput.click());
+      clearBtn.addEventListener('click', reset);
+      fileInput.addEventListener('change', (e) => setFile(e.target.files[0]));
+
+      dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragging'); });
+      dz.addEventListener('dragleave', () => dz.classList.remove('dragging'));
+      dz.addEventListener('drop', (e) => {
+        e.preventDefault(); dz.classList.remove('dragging');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          setFile(e.dataTransfer.files[0]);
         }
+      });
+      dz.addEventListener('click', (e) => {
+        if (e.target === dz) fileInput.click();
+      });
+
+      analyzeBtn.addEventListener('click', async () => {
+        if (!file) { alert('Please choose a video'); return; }
         const formData = new FormData();
-        formData.append('video', fileInput.files[0]);
-        submitBtn.disabled = true;
-        status.textContent = 'Uploading and analyzing... this can take up to a minute for longer videos.';
+        formData.append('video', file);
+        analyzeBtn.disabled = true; pickBtn.disabled = true; clearBtn.disabled = true;
+        setStatus('Uploading and analyzing… this can take up to a minute for longer videos.', true);
         output.value = '';
         try {
           const res = await fetch('/api/analyze', { method: 'POST', body: formData });
@@ -52,11 +185,11 @@
           }
           const data = await res.json();
           output.value = data.report || '';
-          status.textContent = 'Done.';
+          setStatus('Done.');
         } catch (e) {
-          status.textContent = 'Error: ' + e.message;
+          setStatus('Error: ' + e.message);
         } finally {
-          submitBtn.disabled = false;
+          analyzeBtn.disabled = false; pickBtn.disabled = false; clearBtn.disabled = false;
         }
       });
     </script>
