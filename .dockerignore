@@ -1,0 +1,16 @@
+.git
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+.ipynb_checkpoints
+BehaviorAnalysis/
+*.mp4
+*.avi
+*.mkv
+*.mov
+sam2_final.ipynb
+resources/example.jpeg
+

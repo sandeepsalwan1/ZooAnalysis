@@ -242,3 +242,32 @@ AnimalCare is released under the [MIT License](https://opensource.org/licenses/M
 
 
 ---
+
+## Quickstart (Web App)
+
+Local dev (Python 3.11+):
+
+```sh
+pip install -r requirements-web.txt
+export OPENAI_API_KEY=your_key_here
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Open http://localhost:8000 and upload a short animal video.
+
+API:
+- POST `/api/analyze` with `multipart/form-data` field `video`.
+
+## Deployment
+
+### Docker
+```sh
+docker build -t animalcare .
+docker run -e OPENAI_API_KEY=your_key -p 8000:8000 animalcare
+```
+
+### Render (Docker)
+1. Push this repo to GitHub
+2. Create a Web Service on Render using this repo (Render will read `render.yaml`)
+3. Add environment variable `OPENAI_API_KEY`
+4. Deploy and visit the service URL

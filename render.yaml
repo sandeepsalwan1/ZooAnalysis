@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: animalcare
+    env: docker
+    plan: free
+    region: oregon
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+
