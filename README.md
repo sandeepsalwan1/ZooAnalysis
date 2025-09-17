@@ -271,3 +271,15 @@ docker run -e OPENAI_API_KEY=your_key -p 8000:8000 animalcare
 2. Create a Web Service on Render using this repo (Render will read `render.yaml`)
 3. Add environment variable `OPENAI_API_KEY`
 4. Deploy and visit the service URL
+
+### Vercel (Next.js)
+
+- App lives in `web/` (Next.js 14, Tailwind, Framer Motion, Edge API).
+- Import the repo in Vercel and set Root Directory to `web`.
+- Add env var `OPENAI_API_KEY`.
+
+Deploy button:
+
+```
+https://vercel.com/new/clone?repository-url=<YOUR_REPO_URL>&root-directory=web&env=OPENAI_API_KEY
+```
